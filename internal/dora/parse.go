@@ -1,9 +1,12 @@
 package dora
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 const (
-	ObjectAcessType accessType = iota
+	ObjectAcess accessType = iota
 	ArrayAccess
 )
 
@@ -15,7 +18,7 @@ type queryToken struct {
 	indexReq   int
 }
 
-func scanQueryTokens(query []rune) ([]queryToken, error) {
+func scanQueryTokens(query []byte) ([]queryToken, error) {
 	var qts []queryToken
 
 	queryLen := len(query)
@@ -29,7 +32,7 @@ func scanQueryTokens(query []rune) ([]queryToken, error) {
 			if err != nil {
 				return []queryToken{}, err
 			}
-			qts = append(qts, queryToken{AccessType: ObjectAccess, keyReq: string(s)})
+			qts = append(qts, queryToken{AccessType: ObjectAcess, keyReq: string(s)})
 			i += jump - 1
 		case '[':
 			i++
@@ -55,7 +58,7 @@ func scanQueryTokens(query []rune) ([]queryToken, error) {
 	return qts, nil
 }
 
-func parseObjSelector(queryChunk []rune) ([]rune, int, bool, error) {
+func parseObjSelector(queryChunk []byte) ([]byte, int, bool, error) {
 	var jump int
 	var isIndex bool
 
@@ -74,16 +77,16 @@ func parseObjSelector(queryChunk []rune) ([]rune, int, bool, error) {
 		}
 		return nil, 0, isIndex, errSelectorSyntax(string(queryChunk[jump]))
 	}
-
+	return nil, 0, isIndex, fmt.Errorf("Error parsing object selector within query. Expected string, but started with %s",
+		string(queryChunk[jump]))
 }
 
-
-func parseArraySelector(queryChunk[]rune)([]rune, int,error){
+func parseArraySelector(queryChunk []byte) ([]byte, int, error) {
 	var jump int
 	queryLen := len(queryChunk)
 
-	if isNumber(queryChunk[jump]){
-		for isNumber(queryChunk[jump]) && jump < queryLen -1 {
+	if isNumber(queryChunk[jump]) {
+		for isNumber(queryChunk[jump]) && jump < queryLen-1 {
 			jump++
 		}
 		return queryChunk[0:jump], jump, nil
@@ -92,14 +95,14 @@ func parseArraySelector(queryChunk[]rune)([]rune, int,error){
 	return nil, 0, fmt.Errorf("error parsing array selector within query. expected int, but started with %s", string(queryChunk[jump]))
 }
 
-func isPropertyKey(char rune) bool{
+func isPropertyKey(char byte) bool {
 	return isLetter(char) || isNumber(char)
 }
 
-func isLetter(char rune)bool{
-	return char => 'a' && char <='z' || char => 'A' && char <='Z' || char == '_'
+func isLetter(char byte) bool {
+	return char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || char == '_'
 }
 
-func isNumber(char rune)bool{
-	return '0' <= char && char <='9'
+func isNumber(char byte) bool {
+	return '0' <= char && char <= '9'
 }
