@@ -5,8 +5,8 @@ import (
 )
 
 type Lexer struct {
-	Input        []rune
-	char         rune //current char under examination
+	Input        []byte
+	char         byte //current char under examination
 	position     int  //current position in input (points to current char)
 	readPosition int  //current reading position in input (after current char)
 	line         int  //line number for error reporting
@@ -14,7 +14,7 @@ type Lexer struct {
 
 func New(input string) *Lexer {
 	l := &Lexer{
-		Input: []rune(input),
+		Input: []byte(input),
 	}
 	l.ReadChar()
 
@@ -97,7 +97,7 @@ func (l *Lexer) SkipWhitespace() {
 	}
 }
 
-func NewToken(tokenType Token.Type, line, start, end int, char ...rune) Token.Token {
+func NewToken(tokenType Token.Type, line, start, end int, char ...byte) Token.Token {
 	return Token.Token{
 		Type:    tokenType,
 		Line:    line,
@@ -129,11 +129,11 @@ func (l *Lexer) readNumber() string {
 	return string(l.Input[position:l.position])
 }
 
-func isNumber(input rune) bool {
+func isNumber(input byte) bool {
 	return input >= '0' && input <= '9' || input == '-' || input == '.'
 }
 
-func isLetter(input rune) bool {
+func isLetter(input byte) bool {
 	return input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z'
 }
 
