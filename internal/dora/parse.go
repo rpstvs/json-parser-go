@@ -51,6 +51,7 @@ func scanQueryTokens(query []byte) ([]queryToken, error) {
 			qts = append(qts, queryToken{AccessType: ArrayAccess, indexReq: index})
 			i += jump
 		default:
+			fmt.Println("coming from scanquery")
 			return []queryToken{}, errSelectorSyntax(string(query[i]))
 		}
 
