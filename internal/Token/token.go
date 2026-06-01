@@ -10,6 +10,8 @@ type Token struct {
 	Line    int
 	Start   int
 	End     int
+	Prefix  string
+	Suffix  string
 }
 
 const (
