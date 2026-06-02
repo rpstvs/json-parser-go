@@ -34,7 +34,14 @@ func (l *Lexer) ReadChar() {
 func (l *Lexer) NextToken() Token.Token {
 	var t Token.Token
 
-	l.SkipWhitespace()
+	if l.isWhiteSpace() {
+		t.Type = Token.Whitespace
+		t.Line = l.line
+		t.Literal = l.readWhitespace()
+		t.Start = l.position
+		t.End = l.position
+		return t
+	}
 
 	switch l.char {
 	case '{':
@@ -55,6 +62,8 @@ func (l *Lexer) NextToken() Token.Token {
 		t.Line = l.line
 		t.Start = l.position
 		t.End = l.position + 1
+		t.Prefix = string(l.char)
+		t.Suffix = string(l.char)
 	case 0:
 		t.Literal = ""
 		t.Type = Token.EOF
@@ -88,13 +97,19 @@ func (l *Lexer) NextToken() Token.Token {
 	return t
 }
 
-func (l *Lexer) SkipWhitespace() {
-	for l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
+func (l *Lexer) isWhiteSpace() bool {
+	return l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r'
+}
+
+func (l *Lexer) readWhitespace() string {
+	var result string
+	if l.isWhiteSpace() {
 		if l.char == '\n' {
 			l.line++
 		}
-		l.ReadChar()
+		result += string(l.char)
 	}
+	return result
 }
 
 func NewToken(tokenType Token.Type, line, start, end int, char ...byte) Token.Token {
