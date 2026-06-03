@@ -44,6 +44,8 @@ func (l *Lexer) NextToken() Token.Token {
 	}
 
 	switch l.char {
+	case '/':
+		return l.readComment()
 	case '{':
 		t = NewToken(Token.LeftBrace, l.line, l.position, l.position+1, l.char)
 	case '}':
@@ -110,6 +112,55 @@ func (l *Lexer) readWhitespace() string {
 		result += string(l.char)
 	}
 	return result
+}
+
+func (l *Lexer) readComment() Token.Token {
+	var t Token.Token
+
+	t.Start = l.position
+	t.Line = l.line
+
+	switch l.char {
+	case '/':
+		l.ReadChar()
+		t.Type = Token.LineComment
+		t.Literal = l.readString()
+		t.End = l.position
+		t.Prefix = "//"
+		return t
+	case '*':
+		return l.readBlockComment()
+	default:
+		t.End = l.position
+		t.Type = Token.Illegal
+		return t
+	}
+}
+
+func (l *Lexer) readBlockComment() Token.Token {
+	var t Token.Token
+
+	t.Start = l.position
+	t.Line = l.line
+	t.Type = Token.BlockComment
+
+	position := l.position
+
+	for {
+		prevChar := l.char
+		l.ReadChar()
+
+		if l.char == '/' && prevChar == '*' {
+			l.ReadChar()
+			break
+		}
+	}
+	t.Literal = string(l.Input[position : l.position-2])
+	t.End = l.position
+	t.Prefix = "/*"
+	t.Suffix = "*/"
+
+	return t
 }
 
 func NewToken(tokenType Token.Type, line, start, end int, char ...byte) Token.Token {
