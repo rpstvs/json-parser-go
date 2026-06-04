@@ -105,11 +105,12 @@ func (l *Lexer) isWhiteSpace() bool {
 
 func (l *Lexer) readWhitespace() string {
 	var result string
-	if l.isWhiteSpace() {
+	for l.isWhiteSpace() {
 		if l.char == '\n' {
 			l.line++
 		}
 		result += string(l.char)
+		l.ReadChar()
 	}
 	return result
 }
@@ -124,7 +125,7 @@ func (l *Lexer) readComment() Token.Token {
 	case '/':
 		l.ReadChar()
 		t.Type = Token.LineComment
-		t.Literal = l.readString()
+		t.Literal = l.readLine()
 		t.End = l.position
 		t.Prefix = "//"
 		return t
@@ -149,6 +150,12 @@ func (l *Lexer) readBlockComment() Token.Token {
 	for {
 		prevChar := l.char
 		l.ReadChar()
+
+		if l.char == 0 {
+			t.Type = Token.Illegal
+			t.End = l.position
+			return t
+		}
 
 		if l.char == '/' && prevChar == '*' {
 			l.ReadChar()
@@ -184,6 +191,26 @@ func (l *Lexer) readString() string {
 		}
 	}
 	return string(l.Input[position:l.position])
+}
+
+func (l *Lexer) readLine() string {
+	position := l.position
+
+	for {
+
+		l.ReadChar()
+
+		if l.char == 0 {
+			break
+		}
+
+		if l.char == '\n' {
+			l.line++
+			l.ReadChar()
+			break
+		}
+	}
+	return string(l.Input[position+1 : l.position])
 }
 
 func (l *Lexer) readNumber() string {
