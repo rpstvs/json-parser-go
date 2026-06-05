@@ -120,7 +120,7 @@ func (l *Lexer) readComment() Token.Token {
 
 	t.Start = l.position
 	t.Line = l.line
-
+	l.ReadChar()
 	switch l.char {
 	case '/':
 		l.ReadChar()
@@ -141,10 +141,10 @@ func (l *Lexer) readComment() Token.Token {
 func (l *Lexer) readBlockComment() Token.Token {
 	var t Token.Token
 
-	t.Start = l.position
+	t.Start = l.position - 1
 	t.Line = l.line
 	t.Type = Token.BlockComment
-
+	l.ReadChar()
 	position := l.position
 
 	for {

@@ -37,6 +37,24 @@ func TestNextToken(t *testing.T) {
 
 	assertLexerMatches(t, l, tests)
 }
+func TestBlockComment(t *testing.T) {
+	input := `/* Initial comment
+spanning
+multiple lines 
+*/`
+
+	tests := []Token.Token{
+		{Type: Token.BlockComment, Literal: ` Initial comment
+spanning
+multiple lines 
+`, Line: 0, Prefix: "/*", Suffix: "*/"},
+		{Type: Token.EOF, Literal: "", Line: 0},
+	}
+
+	l := New(input)
+
+	assertLexerMatches(t, l, tests)
+}
 
 func assertLexerMatches(t *testing.T, l *Lexer, tests []Token.Token) {
 	for i, expectedToken := range tests {
