@@ -27,12 +27,29 @@ func TestJSONObjectChildren(t *testing.T) {
 
 		program := p.ParseJSON()
 
-		rv := program.RootValue
+		rv := *program.RootValue
 
-		val := rv.Value.(ast.Object)
+		val := rv.(ast.Object)
+
+		checkParserForErrors(t, p)
 
 		if len(val.Children) != test.childrenLen {
-			t.Fatalf("The length of the children does not contain 1 statement. Got: %d", len(val.Children))
+			t.Fatalf("The length of the children does not contain 1 statement.Expected: %d; Got: %d", test.childrenLen, len(val.Children))
 		}
 	}
+}
+
+func checkParserForErrors(t *testing.T, p *Parser) {
+	errors := p.errors
+
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("Parser has %d errors", len(errors))
+
+	for _, val := range p.errors {
+		t.Errorf("Parser error: %q", val)
+	}
+	t.FailNow()
 }

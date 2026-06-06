@@ -74,8 +74,8 @@ func (p *Parser) parseJSONObject() ast.Value {
 				p.nextToken()
 			} else {
 				p.parseError(fmt.Sprintf("Error parsing JSON Object Expected '{' token, got %s", p.currentToken.Literal))
+				return nil
 			}
-			return nil
 		case ast.ObjOpen:
 			if p.currentTokenTypeIs(Token.RightBrace) {
 				p.nextToken()
@@ -95,8 +95,8 @@ func (p *Parser) parseJSONObject() ast.Value {
 				p.nextToken()
 			} else {
 				p.parseError(fmt.Sprintf("Error parsing JSON Object Expected '}' token, got %s", p.currentToken.Literal))
+				return nil
 			}
-			return nil
 		case ast.ObjComma:
 			prop := p.parseProperty()
 			if prop.Value != nil {
