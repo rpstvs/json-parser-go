@@ -21,7 +21,7 @@ func TestJSONObjectChildren(t *testing.T) {
 		{input: "{\"key5\":\" value7\", \"key6\": \"value7\", \"key7\": \"value8\"}", childrenLen: 3},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		l := lexer.New(test.input)
 		p := New(l)
 
@@ -34,7 +34,7 @@ func TestJSONObjectChildren(t *testing.T) {
 		checkParserForErrors(t, p)
 
 		if len(val.Children) != test.childrenLen {
-			t.Fatalf("The length of the children does not contain 1 statement.Expected: %d; Got: %d", test.childrenLen, len(val.Children))
+			t.Fatalf("TEST[%d] - Length of Children does not match.Expected: %d; Got: %d", i, test.childrenLen, len(val.Children))
 		}
 	}
 }

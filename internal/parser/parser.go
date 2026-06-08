@@ -221,7 +221,6 @@ func (p *Parser) parseProperty() ast.Property {
 		case ast.PropertyColon:
 			val := p.ParseValue()
 			prop.Value = val
-			p.nextToken()
 		}
 
 	}

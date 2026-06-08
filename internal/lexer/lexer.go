@@ -58,7 +58,7 @@ func (l *Lexer) NextToken() Token.Token {
 		t = NewToken(Token.Colon, l.line, l.position, l.position+1, l.char)
 	case ',':
 		t = NewToken(Token.Comma, l.line, l.position, l.position+1, l.char)
-	case '"':
+	case '"', '\'':
 		t.Type = Token.String
 		t.Literal = l.readString()
 		t.Line = l.line
@@ -210,7 +210,7 @@ func (l *Lexer) readLine() string {
 			break
 		}
 	}
-	return string(l.Input[position+1 : l.position])
+	return string(l.Input[position:l.position])
 }
 
 func (l *Lexer) readNumber() string {
@@ -233,7 +233,7 @@ func isLetter(input byte) bool {
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 
-	for isNumber(l.char) {
+	for isLetter(l.char) {
 		l.ReadChar()
 	}
 	return string(l.Input[position:l.position])
