@@ -193,6 +193,7 @@ func (p *Parser) parseProperty() ast.Property {
 	for !p.currentTokenTypeIs(Token.EOF) {
 		switch propertyState {
 		case ast.PropertyStart:
+			p.parseStructture()
 			if p.currentTokenTypeIs(Token.String) {
 				key := ast.Identifier{
 					Type:  "Identifier",
@@ -209,6 +210,7 @@ func (p *Parser) parseProperty() ast.Property {
 			}
 
 		case ast.PropertyKey:
+			p.parseStructture()
 			if p.currentTokenTypeIs(Token.Colon) {
 				propertyState = ast.PropertyColon
 				p.nextToken()
@@ -219,8 +221,13 @@ func (p *Parser) parseProperty() ast.Property {
 				))
 			}
 		case ast.PropertyColon:
+			p.parseStructture()
 			val := p.ParseValue()
 			prop.Value = val
+			propertyState = ast.PropertyValue
+		case ast.PropertyValue:
+			p.parseStructture()
+			return prop
 		}
 
 	}
@@ -229,6 +236,17 @@ func (p *Parser) parseProperty() ast.Property {
 
 func (p *Parser) parseString() string {
 	return p.currentToken.Literal
+}
+
+func (p *Parser) parseStructture() {
+	for {
+		switch p.currentToken.Type {
+		case Token.BlockComment, Token.LineComment, Token.Whitespace:
+			p.nextToken()
+		default:
+			return
+		}
+	}
 }
 
 func (p *Parser) expectPeekType(t Token.Type) bool {

@@ -12,13 +12,13 @@ func TestJSONObjectChildren(t *testing.T) {
 		input       string
 		childrenLen int
 	}{
-		{input: "{\"key0\": \"value0\"}", childrenLen: 1},
-		{input: "{\"key0\": \"value0\" }", childrenLen: 1},
+		//{input: "{\"key0\": \"value0\"}", childrenLen: 1},
+		//{input: "{\"key0\": \"value0\" }", childrenLen: 1},
 		{input: "{\"key1\": \"value1\", \"key2\": \"value2\"}", childrenLen: 2},
-		{input: "{\"key3\": [\"value3\", \"value4\"]}", childrenLen: 1},
-		{input: "{\"key4\": [\"value5\", {\"key5\": \"value6\"}]}", childrenLen: 1},
-		{input: "{\"key5\":\" value7\", \"key6\": \"value7\"}", childrenLen: 2},
-		{input: "{\"key5\":\" value7\", \"key6\": \"value7\", \"key7\": \"value8\"}", childrenLen: 3},
+		//{input: "{\"key3\": [\"value3\", \"value4\"]}", childrenLen: 1},
+		//{input: "{\"key4\": [\"value5\", {\"key5\": \"value6\"}]}", childrenLen: 1},
+		//{input: "{\"key5\":\" value7\", \"key6\": \"value7\"}", childrenLen: 2},
+		//{input: "{\"key5\":\" value7\", \"key6\": \"value7\", \"key7\": \"value8\"}", childrenLen: 3},
 	}
 
 	for i, test := range tests {

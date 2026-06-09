@@ -55,6 +55,7 @@ const (
 	PropertyStart
 	PropertyKey
 	PropertyColon
+	PropertyValue
 
 	ArrayStart
 	ArrayOpen
