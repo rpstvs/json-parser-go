@@ -114,44 +114,51 @@ func (p *Parser) parseJSONArray() ast.Value {
 		Type: "Array",
 	}
 	arrayState := ast.ArrayStart
-
-	switch arrayState {
-	case ast.ArrayStart:
-		if p.currentTokenTypeIs(Token.LeftBracket) {
-			array.Start = p.currentToken.Start
-			arrayState = ast.ArrayOpen
-		}
-		return nil
-	case ast.ArrayOpen:
-		if p.currentTokenTypeIs(Token.RightBracket) {
-
-			array.End = p.currentToken.End
-			p.nextToken()
-			return array
-		}
-		val := p.ParseValue()
-		array.Children = append(array.Children, val)
-		arrayState = ast.ArrayValue
-		if p.peekTokenTypeIs(Token.RightBrace) {
-			p.nextToken()
-		}
-	case ast.ArrayValue:
-		if p.currentTokenTypeIs(Token.RightBracket) {
-			array.End = p.currentToken.End
-			p.nextToken()
-			return array
-		} else if p.currentTokenTypeIs(Token.Comma) {
+	p.parseStructture()
+	for !p.currentTokenTypeIs(Token.EOF) {
+		switch arrayState {
+		case ast.ArrayStart:
+			if p.currentTokenTypeIs(Token.LeftBracket) {
+				array.Start = p.currentToken.Start
+				arrayState = ast.ArrayOpen
+				p.nextToken()
+			}
+		case ast.ArrayOpen:
+			if p.currentTokenTypeIs(Token.RightBracket) {
+				array.End = p.currentToken.End
+				p.nextToken()
+				return array
+			}
+			val := p.ParseValue()
+			array.Children = append(array.Children, val)
+			arrayState = ast.ArrayValue
+			if p.peekTokenTypeIs(Token.RightBracket) {
+				p.nextToken()
+			}
+		case ast.ArrayValue:
+			if p.currentTokenTypeIs(Token.RightBracket) {
+				array.End = p.currentToken.End
+				p.nextToken()
+				return array
+			} else if p.currentTokenTypeIs(Token.Comma) {
+				arrayState = ast.ArrayComma
+				p.nextToken()
+			} else {
+				p.parseError(fmt.Sprintf(
+					"Error parsing property. Expected RightBrace or Comma token, got: %s",
+					p.currentToken.Literal,
+				))
+			}
+		case ast.ArrayComma:
+			if p.currentTokenTypeIs(Token.RightBracket) {
+				array.End = p.currentToken.End
+				p.nextToken()
+				return array
+			}
+			val := p.ParseValue()
+			array.Children = append(array.Children, val)
 			arrayState = ast.ArrayComma
-		} else {
-			p.parseError(fmt.Sprintf(
-				"Error parsing property. Expected RightBrace or Comma token, got: %s",
-				p.currentToken.Literal,
-			))
 		}
-	case ast.ArrayComma:
-		val := p.ParseValue()
-		array.Children = append(array.Children, val)
-		arrayState = ast.ArrayComma
 	}
 	array.End = p.currentToken.Start
 	return array
